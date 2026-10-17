@@ -1,9 +1,16 @@
 # 豆包电脑版怎么参与
 
-**结论：豆包装不了这个 Skill。** 它没有插件目录、读不到本地文件、也执行不了脚本。
-豆包参与的方式是**接收文本**——所有上下文由 DSH 整理成一段可直接粘贴的提示词。
+**结论：豆包装不了这个 Skill，也不能自己调用它。** 它没有插件目录、读不到本地文件、执行不了脚本。
+豆包参与的方式是**接收文本**——所有上下文由 DSH 整理好交给它。
 
-所以豆包这边只有两件事要做：**一次性设定**（让它记住纪律）+ **每次粘贴**（给它任务和证据）。
+两种接入强度：
+
+| 做法 | 你要做什么 | 效果 |
+|---|---|---|
+| **人工（默认）** | 一次性设定常驻纪律 + 每次粘贴 make_brief 生成的包 | 现在就能用，无需任何配置 |
+| **全自动** | 配一个火山引擎方舟 API Key | DSH 直接调豆包模型，结果自动落盘 + 核查 |
+
+先看人工方式（第一节到第三节），想要免粘贴就跳到 [三·五](#三五全自动让-dsh-直接调用豆包模型)。
 
 ---
 
@@ -53,6 +60,35 @@ python scripts/make_brief.py --project . --stage G5 --to doubao --section 3.2   
 1. 落盘到 `05_draft/v<N>_<section>.md`（文件头记 `author: doubao` / `saved_by: dsh`）
 2. 跑 `claim_check.py` 核对每个数字是否可追溯到 `claims.csv`、有没有把假设写成实证
 3. 有问题就一次性列清退回，只改必须改的点
+
+---
+
+## 三·五、全自动：让 DSH 直接调用豆包模型
+
+上面两步都要人工复制粘贴。如果你有**火山引擎方舟（Ark）**的 API Key，可以让 DSH 直接调用豆包模型，省掉搬运：
+
+```powershell
+$env:ARK_API_KEY="你的 key"
+$env:ARK_MODEL="doubao-pro-32k"        # 或你的接入点 ep-xxxx
+
+python scripts/make_brief.py --project . --stage G5 --to doubao --section 3.2 --via api
+```
+
+它做的事：
+
+1. 用 `integrations/doubao.md` 里那段常驻纪律作 **system prompt**——等于把这个 skill 的写作纪律装进豆包
+2. 用 make_brief 生成的包作 **user message**（含证据表、大纲要求、禁写清单）
+3. 拿回结果直接落盘到 `05_draft/`，frontmatter 记 `via: api` / `model` / `claim_check: pending`
+4. 打印该跑的 `claim_check.py` 命令
+
+**注意**：`--via api` 只适用于 `--to doubao`。Codex 是能读文件的 agent，不需要也没法这样调。
+
+缺 key 时会 `exit 5` 并给配置指引，同时**保留已生成的提示词包**，可以退回手工粘贴——不会卡死。
+
+| 方式 | 需要什么 | 人工量 |
+|---|---|---|
+| `--via paste`（默认） | 无 | 复制粘贴两趟 |
+| `--via api` | Ark API Key + 模型 ID | 一条命令 |
 
 ---
 

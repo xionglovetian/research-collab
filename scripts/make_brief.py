@@ -5,18 +5,22 @@
 路线、大纲、证据台账拼成一份可直接粘贴的完整提示词，避免手工漏项。
 
 用法：
-    # G4：让豆包做叙事反馈（读结果，判断论文该写什么）
+    # G4：让豆包做叙事反馈（生成包，人工粘贴）
     python make_brief.py --project "<项目目录>" --stage G4 --to doubao
 
-    # G5：让豆包写某一节
+    # G5：让豆包写某一节（生成包）
     python make_brief.py --project "<项目目录>" --stage G5 --to doubao --section "3.2"
 
     # G1：给 Codex 的路线包（路径型，它能自己读文件）
     python make_brief.py --project "<项目目录>" --stage G1 --to codex
 
-输出写到 <项目>/handoffs/<stage>_<to>_<日期>.md，并打印路径。
+    # 全自动：直接调用豆包模型（需 ARK_API_KEY / ARK_MODEL）
+    python make_brief.py --project "<项目目录>" --stage G5 --to doubao --section 3.2 --via api
 
-退出码：0 成功；2 输入错误（缺项目文件）；4 找不到指定小节。
+输出写到 <项目>/handoffs/<stage>_<to>_<日期>.md；--via api 时还会把模型输出
+落盘到 <项目>/05_draft/ 并提示跑 claim_check。
+
+退出码：0 成功；2 输入错误（缺项目文件）；4 找不到指定小节；5 模型调用失败（缺 key/网络/接口）。
 """
 
 from __future__ import annotations
@@ -24,9 +28,13 @@ from __future__ import annotations
 import argparse
 import csv
 import datetime as _dt
+import os
 import re
 import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import doubao_api  # noqa: E402  (同目录模块，供 --via api 使用)
 
 for _stream in (sys.stdout, sys.stderr):
     if hasattr(_stream, "reconfigure"):
@@ -233,8 +241,19 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--stage", required=True, choices=["G1", "G4", "G5"], help="阶段")
     parser.add_argument("--to", required=True, choices=["doubao", "codex"], help="目标工具")
     parser.add_argument("--section", default=None, help="G5 用：章节号，如 3.2")
+    parser.add_argument(
+        "--via",
+        choices=["paste", "api"],
+        default="paste",
+        help="paste=只生成包供人工粘贴（默认）；api=直接调用豆包模型并落盘",
+    )
+    parser.add_argument("--model", default=None, help="--via api 用：模型 ID 或接入点，默认读 ARK_MODEL")
     parser.add_argument("--out", default=None, help="输出路径，默认 <项目>/handoffs/...")
     args = parser.parse_args(argv)
+
+    if args.via == "api" and args.to != "doubao":
+        print("[x] --via api 只适用于 --to doubao（Codex 是读文件的 agent，不需要 API 调用）", file=sys.stderr)
+        return 2
 
     project = Path(args.project).expanduser().resolve()
     state_path = project / "state.yaml"
@@ -317,10 +336,52 @@ def main(argv: list[str] | None = None) -> int:
     print(f"已生成：{out}")
     print(f"  目标：{args.to}   阶段：{args.stage}")
     print(f"  证据：{len(claims)} 条   公共区：{shared}")
-    if args.to == "doubao":
+
+    if args.to != "doubao":
+        return 0
+
+    if args.via == "paste":
         print()
         print("  豆包读不到文件：把整份内容复制进豆包对话框即可，不要只给路径。")
         print("  收回来后交给 DSH 落盘 + claim_check。")
+        print("  想全自动直接调用模型：加 --via api（需要 ARK_API_KEY / ARK_MODEL）")
+        return 0
+
+    # ---- --via api：直接调用豆包模型 ----
+    try:
+        answer = doubao_api.call(body, model=args.model)
+    except doubao_api.ArkError as exc:
+        print(f"[x] {exc}", file=sys.stderr)
+        print(f"    提示词包已保留在 {out}，可手工粘贴进豆包。", file=sys.stderr)
+        return 5
+
+    if args.stage == "G4":
+        target = project / "05_draft" / f"narrative_{today}.md"
+        fm = (
+            "---\n"
+            f"stage: G4\nauthor: doubao\nvia: api\n"
+            f"model: {args.model or os.environ.get('ARK_MODEL', '')}\n"
+            f"source_brief: handoffs/{out.name}\nclaim_check: pending\n---\n\n"
+        )
+    else:  # G5
+        target = project / "05_draft" / f"v1_{args.section.replace('.', '_')}.md"
+        fm = (
+            "---\n"
+            f"section: {args.section}\nversion: 1\nauthor: doubao\nvia: api\n"
+            f"model: {args.model or os.environ.get('ARK_MODEL', '')}\n"
+            f"source_brief: handoffs/{out.name}\nclaim_check: pending\n---\n\n"
+        )
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(fm + answer.strip() + "\n", encoding="utf-8", newline="\n")
+
+    print()
+    print(f"已通过 API 调用豆包并落盘：{target}")
+    print("  下一步（必做）：")
+    print(
+        f"    python scripts/claim_check.py --draft \"{target}\" "
+        f"--claims \"{project / '04_results' / 'claims.csv'}\""
+    )
+    print("  未匹配的数字必须逐条处理：补进台账，或改写。")
     return 0
 
 

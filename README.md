@@ -231,7 +231,8 @@ DSH 会陪你填 `brief.md`，然后逐棒推进。每一步的提示词包存�
 | 脚本 | 作用 |
 |---|---|
 | `scripts/init_workspace.py` | 初始化项目骨架，并把模板放进**你自己建的**公共区（`--shared-dir`）。只创建缺失文件，永不覆盖 |
-| `scripts/make_brief.py` | 自动生成交接提示词包（`--stage G1/G4/G5 --to codex/doubao`），从路线、大纲、台账拼装；给豆包的包必定自带全部内容 |
+| `scripts/make_brief.py` | 自动生成交接提示词包（`--stage G1/G4/G5 --to codex/doubao`），从路线、大纲、台账拼装；加 `--via api` 可直接调用豆包模型并落盘 |
+| `scripts/doubao_api.py` | 豆包模型调用封装（火山方舟 OpenAI 兼容接口），供 `--via api` 使用；也可单独当命令行用 |
 | `scripts/check_shared.py` | `--freeze` 冻结路线哈希；`--verify` 校验是否被改；`--for <agent>` 列出等谁回应；`--tail N` 看最近对话 |
 | `scripts/claim_check.py` | 核对草稿数字与台账，检测强度升级，列出未使用证据。退出码 1 可直接当门禁 |
 
@@ -303,11 +304,22 @@ research-collab/
 
 ### 豆包电脑版怎么接入
 
-**它装不了 Skill**——没有插件目录、读不到本地文件、执行不了脚本。豆包以"接收文本"的方式参与：
+**它装不了 Skill，也不能自己调用它**——没有插件目录、读不到本地文件、执行不了脚本。豆包以"接收文本"的方式参与，两种强度：
+
+**人工（默认，零配置）**
 
 1. **一次性设定**：把 [integrations/doubao.md](integrations/doubao.md) 里那段常驻纪律，粘进豆包的「自定义指令 / 智能体 / 角色设定」（有就设，没有就每次开新对话时先发一次）。
 2. **每次任务**：跑 `make_brief.py --to doubao` 生成包，整份复制进豆包。
 3. **收回来**：贴回给 DSH 落盘并跑 `claim_check.py` 核查数字。
+
+**全自动（需要 Ark API Key）**
+
+```powershell
+$env:ARK_API_KEY="..."; $env:ARK_MODEL="doubao-pro-32k"
+python scripts/make_brief.py --project . --stage G5 --to doubao --section 3.2 --via api
+```
+
+此时 DSH 直接把常驻纪律当 system prompt、把包当 user message 发给豆包模型，结果落盘到 `05_draft/` 并提示核查。等于"豆包用上了这个 skill"。
 
 详见 [integrations/doubao.md](integrations/doubao.md)。
 
