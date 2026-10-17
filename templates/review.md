@@ -1,7 +1,7 @@
 # 审稿意见（Codex 产出）
 
 > 日期：{{DATE}} ｜ 评审对象：<!-- 05_draft/ 下的版本号 -->
-> 参考：`shared/route.md`（冻结版）、`shared/outline.md`、`05_draft/narrative_*.md`、`04_results/claims.csv`
+> 参考：公共区的 `route.md`（冻结版）与 `outline.md`（位置见 `state.yaml` 的 `shared_dir`）、`05_draft/narrative_*.md`、`04_results/claims.csv`
 
 ## 结论
 

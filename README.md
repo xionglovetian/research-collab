@@ -231,6 +231,7 @@ DSH 会陪你填 `brief.md`，然后逐棒推进。每一步的提示词包存�
 | 脚本 | 作用 |
 |---|---|
 | `scripts/init_workspace.py` | 初始化项目骨架，并把模板放进**你自己建的**公共区（`--shared-dir`）。只创建缺失文件，永不覆盖 |
+| `scripts/make_brief.py` | 自动生成交接提示词包（`--stage G1/G4/G5 --to codex/doubao`），从路线、大纲、台账拼装；给豆包的包必定自带全部内容 |
 | `scripts/check_shared.py` | `--freeze` 冻结路线哈希；`--verify` 校验是否被改；`--for <agent>` 列出等谁回应；`--tail N` 看最近对话 |
 | `scripts/claim_check.py` | 核对草稿数字与台账，检测强度升级，列出未使用证据。退出码 1 可直接当门禁 |
 
@@ -248,7 +249,7 @@ research-collab/
 │   ├── handoff-templates.md        # 给 Codex / 豆包的提示词包模板（含 G4 叙事反馈包）
 │   ├── evidence-ledger.md          # 台账字段、强度阶梯、常见坑
 │   └── workspace-layout.md         # 目录树、文件契约、state.yaml 全字段
-├── scripts/                        # init_workspace / check_shared / claim_check
+├── scripts/                        # init_workspace / make_brief / check_shared / claim_check
 ├── templates/                      # 新项目模板（brief/route/outline/chat/decisions/...）
 ├── examples/walkthrough.md         # 一次完整的端到端演练
 ├── docs/

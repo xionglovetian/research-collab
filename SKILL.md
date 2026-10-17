@@ -59,6 +59,8 @@ DSH 的实施顺序永远服从 `shared/route.md`，不服从任何一方在聊�
 
 `shared_dir` 是相对项目根的路径（如 `./shared`）或绝对路径。多个项目共用一个大目录时，务必一项目一个子目录，否则 `chat.md` 会互相污染。
 
+> **读法约定**：本文件后续凡写作 `shared/xxx` 的地方，都指"**公共区里的** `xxx`"，真实路径一律以 `state.yaml` 的 `shared_dir` 为准。给 Codex / 豆包生成交接包时，`{公共区}` 必须替换成实际路径；**豆包读不到文件，给它的包里只能放内容、不能只放路径**。
+
 **没有公共区就不要进入 G1**——路线、大纲、对话全都写在那里。
 
 | 文件 | 谁写 | 其他人 |
@@ -136,7 +138,15 @@ G4 之后若豆包指出关键证据缺失，允许回到 G3 补做一次；但�
 2. **读对话**：`shared/chat.md` 末尾若干条 + `check_shared.py --for dsh`，把等自己回应的项处理掉或在包中带上。
 3. **验完整性**：`check_shared.py --verify`。路线哈希不符 → 停手问用户。
 4. **备课**：只挑这一棒需要的输入（给 Codex 别塞全文；给豆包只给本节大纲 + 本节 claim 清单 + 术语表 + 相关 chat 原文）。
-5. **出包**：写 `handoffs/<阶段>_<目标>_<日期>.md`，四要素齐全，用 `references/handoff-templates.md` 的现成模板。给豆包的包必须含**禁用清单**和 `[待补:xxx]` 占位符。
+5. **出包**：写 `handoffs/<阶段>_<目标>_<日期>.md`，四要素齐全。**能用脚本就别手搓**：
+
+   ```powershell
+   python scripts/make_brief.py --project . --stage G4 --to doubao                # 叙事反馈包
+   python scripts/make_brief.py --project . --stage G5 --to doubao --section 3.2  # 某节初稿包
+   python scripts/make_brief.py --project . --stage G1 --to codex                # 路线包
+   ```
+
+   它从 `state.yaml`、公共区的 `route.md` / `outline.md`、`04_results/claims.csv` 自动拼装，给豆包的包必定带全内容与禁写清单（**只写路径的包等于没给**）。写正文时 `assumption` 类证据会被自动排除在可用证据之外。手写时按 `references/handoff-templates.md` 的模板，豆包的包必须含**禁用清单**和 `[待补:xxx]` 占位符。
 6. **收产出**：豆包若不能存文件，让用户贴回对话，由 DSH 写入并在文件头记 `saved-by: dsh`。
 7. **入库校验**：文件名、章节层级、字数、占位符残留、数字一致性；不过则附具体修改指令退回。
 8. **发进度**：在 `chat.md` 追加一条 `进度` 或 `反馈`，让 Codex 与豆包（经 DSH 转述）知道发生什么。
@@ -205,6 +215,6 @@ python "${SKILL_DIR}/scripts/claim_check.py" --draft 05_draft/v1_results.md --cl
 | 给 Codex / 豆包的确切提示词模板、收取与退回话术 | `references/handoff-templates.md` |
 | 台账字段、强度判定、如何从结果生成台账 | `references/evidence-ledger.md` |
 | 目录树、每个文件的契约、`state.yaml` 全字段 | `references/workspace-layout.md` |
-| 初始化 / 完整性校验 / 数字核查 | `scripts/*.py` |
+| 初始化 / 生成交接包 / 完整性校验 / 数字核查 | `scripts/*.py` |
 
 按当前阶段取一个文件即可，不要为"读全"而加载 `references/`。
