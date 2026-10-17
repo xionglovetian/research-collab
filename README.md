@@ -1,4 +1,4 @@
-﻿# research-collab
+# research-collab
 
 > 把 **Codex（定科研路线）→ DeepSeek Harness（实施研究）→ 豆包（定怎么讲 + 写作）** 串成一条可追溯的科研协作流水线。
 
