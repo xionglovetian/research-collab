@@ -5,19 +5,16 @@
 一个 **DeepSeek Harness Skill**：用**公共区 + 对话文件 + 证据台账**，让三个互相看不见的 AI 工具协作写出一篇数字不出错、路线不跑偏的论文。
 
 ```mermaid
-flowchart LR
+flowchart TB
+    SH["shared/ 公共区 · 三方共读<br/>route.md · outline.md — 仅 Codex 写<br/>chat.md — 三方追加，永不修改<br/>decisions.md — 已裁决结论<br/>*.sha256 — 冻结锚点"]
+
     CX["Codex<br/>定科研路线与大纲"]
     DS["DeepSeek Harness<br/>实施研究 · 对账"]
     DB["豆包电脑版<br/>定怎么讲 · 写正文"]
 
-    SH["shared/ 公共区 · 三方共读<br/>route.md · outline.md — 仅 Codex 写<br/>chat.md — 三方追加，永不修改<br/>decisions.md · *.sha256 — 裁决与冻结锚点"]
-
-    CX <-->|"读写"| SH
-    DS <-->|"读写"| SH
-    DB <-->|"读写"| SH
-
-    CX -->|"路线 · 大纲"| DS
-    DS -->|"结果简报"| DB
+    SH <-->|"路线 · 大纲"| CX
+    SH <-->|"结果 · 台账"| DS
+    SH <-->|"叙事 · 决策"| DB
 
     classDef codex fill:#eff6ff,stroke:#2563eb,stroke-width:2px,color:#0f172a
     classDef dsh fill:#ecfdf5,stroke:#059669,stroke-width:2px,color:#0f172a
@@ -114,11 +111,26 @@ $ python check_shared.py --for dsh
 
 ## 流水线
 
+```mermaid
+flowchart LR
+    G0["G0<br/>立项"] --> G1["G1<br/>路线"] --> G2["G2<br/>大纲"] --> G3["G3<br/>实施研究"] --> G4["G4<br/>叙事反馈"] --> G5["G5<br/>成稿"] --> G6["G6<br/>审核"] --> G7["G7<br/>交付"]
+
+    classDef you fill:#f1f5f9,stroke:#64748b,stroke-width:2px,color:#0f172a
+    classDef cdx fill:#eff6ff,stroke:#2563eb,stroke-width:2px,color:#0f172a
+    classDef dsh fill:#ecfdf5,stroke:#059669,stroke-width:2px,color:#0f172a
+    classDef db fill:#fff7ed,stroke:#ea580c,stroke-width:2px,color:#0f172a
+    class G0 you
+    class G1,G2,G6 cdx
+    class G3,G7 dsh
+    class G4,G5 db
 ```
-G0 立项 ─► G1 路线(Codex) ─► G2 大纲(Codex) ─► G3 实施研究(DSH)
-                                                    │
-   G7 交付 ◄─ G6 审核(Codex) ◄─ G5 成稿(豆包) ◄─ G4 叙事反馈(豆包) ◄┘
-```
+
+<p align="center"><sub>
+<span style="color:#64748b">■ 你</span>　
+<span style="color:#2563eb">■ Codex</span>　
+<span style="color:#059669">■ DeepSeek Harness</span>　
+<span style="color:#ea580c">■ 豆包电脑版</span>
+</sub></p>
 
 **G4 是本流程的关键设计**：Codex 定"研究什么"，豆包定"这些结果该怎么讲"。两者分开，才不会出现：
 

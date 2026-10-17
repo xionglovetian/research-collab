@@ -12,3 +12,6 @@ Thumbs.db
 
 # 由 init_workspace.py 生成的项目工作区（仓库本身不含任何真实研究数据）
 02_data/raw/
+
+# 本地 mermaid 校验临时文件
+_mermaid_check.*
