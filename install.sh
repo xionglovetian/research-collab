@@ -43,7 +43,7 @@ if [ -e "$DEST" ]; then
 fi
 
 mkdir -p "$DEST"
-for item in SKILL.md README.md LICENSE references scripts templates examples; do
+for item in SKILL.md README.md LICENSE references scripts templates examples integrations; do
   if [ -e "$SRC/$item" ]; then
     cp -R "$SRC/$item" "$DEST/"
   fi

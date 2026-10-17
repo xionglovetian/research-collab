@@ -213,6 +213,7 @@ python "${SKILL_DIR}/scripts/claim_check.py" --draft 05_draft/v1_results.md --cl
 |---|---|
 | 对话文件协议：编号、类型、@寻址、回应/关闭、归档 | `references/chat-protocol.md` |
 | 给 Codex / 豆包的确切提示词模板、收取与退回话术 | `references/handoff-templates.md` |
+| 豆包装不了 Skill，它怎么参与（常驻纪律 + 粘贴包） | `integrations/doubao.md` |
 | 台账字段、强度判定、如何从结果生成台账 | `references/evidence-ledger.md` |
 | 目录树、每个文件的契约、`state.yaml` 全字段 | `references/workspace-layout.md` |
 | 初始化 / 生成交接包 / 完整性校验 / 数字核查 | `scripts/*.py` |

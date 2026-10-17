@@ -41,7 +41,7 @@ if ((Test-Path $dest) -and $Force) {
 }
 
 New-Item -ItemType Directory -Force -Path $dest | Out-Null
-foreach ($item in @('SKILL.md', 'README.md', 'LICENSE', 'references', 'scripts', 'templates', 'examples')) {
+foreach ($item in @('SKILL.md', 'README.md', 'LICENSE', 'references', 'scripts', 'templates', 'examples', 'integrations')) {
     $path = Join-Path $src $item
     if (Test-Path $path) {
         Copy-Item $path -Destination $dest -Recurse -Force

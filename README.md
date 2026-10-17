@@ -252,6 +252,7 @@ research-collab/
 ├── scripts/                        # init_workspace / make_brief / check_shared / claim_check
 ├── templates/                      # 新项目模板（brief/route/outline/chat/decisions/...）
 ├── examples/walkthrough.md         # 一次完整的端到端演练
+├── integrations/doubao.md          # 豆包怎么接入（它装不了 Skill，只能收文本）
 ├── docs/
 │   ├── flow.png                    # 详细流程图（文末「详细流程图」引用）
 │   ├── flow.svg                    # 同图矢量版
@@ -298,8 +299,17 @@ research-collab/
 ## 兼容性
 
 - 本仓库是标准 Skill 目录：`SKILL.md` + YAML frontmatter（`name`、`description`），可被任何遵循该约定的 agent 读取。
-- 主要在 **DeepSeek Harness** 上开发与验证；**Codex** 作为可读技能的 agent 同步可用。
-- 豆包电脑版无文件访问能力，因此它的参与方式是**提示词包 + 人工粘贴**，由 DSH 落盘。
+- 主要在 **DeepSeek Harness** 上开发与验证；**Codex** 作为可读技能的 agent 同步可用（`install.ps1 -Codex` / `install.sh --codex` 会把它链接到 `~/.codex/skills`）。
+
+### 豆包电脑版怎么接入
+
+**它装不了 Skill**——没有插件目录、读不到本地文件、执行不了脚本。豆包以"接收文本"的方式参与：
+
+1. **一次性设定**：把 [integrations/doubao.md](integrations/doubao.md) 里那段常驻纪律，粘进豆包的「自定义指令 / 智能体 / 角色设定」（有就设，没有就每次开新对话时先发一次）。
+2. **每次任务**：跑 `make_brief.py --to doubao` 生成包，整份复制进豆包。
+3. **收回来**：贴回给 DSH 落盘并跑 `claim_check.py` 核查数字。
+
+详见 [integrations/doubao.md](integrations/doubao.md)。
 
 ---
 
