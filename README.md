@@ -4,10 +4,32 @@
 
 一个 **DeepSeek Harness Skill**：用**公共区 + 对话文件 + 证据台账**，让三个互相看不见的 AI 工具协作写出一篇数字不出错、路线不跑偏的论文。
 
-<p align="center">
-  <img src="docs/flow.png" width="100%"
-       alt="research-collab 协作流程：Codex 制定科研路线与大纲，DeepSeek Harness 按路线实施研究，豆包电脑版做叙事反馈与正文写作；三方通过 shared/ 公共区（route.md、outline.md 仅 Codex 可写，chat.md 为三方追加的对话）交换文件，全流程经过 G0 立项 → G1 路线 → G2 大纲 → G3 实施研究 → G4 叙事反馈 → G5 成稿 → G6 审核 → G7 交付 八个阶段">
-</p>
+```mermaid
+flowchart LR
+    CX["Codex<br/>定科研路线与大纲"]
+    DS["DeepSeek Harness<br/>实施研究 · 对账"]
+    DB["豆包电脑版<br/>定怎么讲 · 写正文"]
+
+    SH["shared/ 公共区 · 三方共读<br/>route.md · outline.md — 仅 Codex 写<br/>chat.md — 三方追加，永不修改<br/>decisions.md · *.sha256 — 裁决与冻结锚点"]
+
+    CX <-->|"读写"| SH
+    DS <-->|"读写"| SH
+    DB <-->|"读写"| SH
+
+    CX -->|"路线 · 大纲"| DS
+    DS -->|"结果简报"| DB
+
+    classDef codex fill:#eff6ff,stroke:#2563eb,stroke-width:2px,color:#0f172a
+    classDef dsh fill:#ecfdf5,stroke:#059669,stroke-width:2px,color:#0f172a
+    classDef db fill:#fff7ed,stroke:#ea580c,stroke-width:2px,color:#0f172a
+    classDef shared fill:#0f172a,stroke:#0f172a,color:#f8fafc
+    class CX codex
+    class DS dsh
+    class DB db
+    class SH shared
+```
+
+<p align="center"><sub>上图由 Mermaid 在 GitHub 端渲染；带配色的详细版见文末 <a href="#详细流程图">详细流程图</a></sub></p>
 
 [English summary](#english-summary) · [快速开始](#快速开始) · [它到底防什么事故](#它到底防什么事故) · [目录结构](#目录结构)
 
@@ -204,7 +226,7 @@ research-collab/
 ├── templates/                      # 新项目模板（brief/route/outline/chat/decisions/...）
 ├── examples/walkthrough.md         # 一次完整的端到端演练
 ├── docs/
-│   ├── flow.png                    # 首页流程图（README 引用）
+│   ├── flow.png                    # 详细流程图（文末「详细流程图」引用）
 │   ├── flow.svg                    # 同图矢量版
 │   └── make_flow.py                # 生成上面两张图的脚本，改布局跑它即可
 ├── install.ps1  install.sh
@@ -214,6 +236,21 @@ research-collab/
 改流程图：编辑 `docs/make_flow.py` 里的常量后 `python docs/make_flow.py`，再用浏览器
 （或 `msedge --headless --screenshot=docs/flow.png --window-size=1200,840 docs/flow.svg`）
 重新导出 PNG。
+
+---
+
+## 详细流程图
+
+带配色、三方职责、G0–G7 流水线与三条防线的完整版：
+
+<p align="center">
+  <img src="docs/flow.png" width="100%"
+       alt="research-collab 详细流程图：Codex 定科研路线与大纲、DeepSeek Harness 实施研究并对账、豆包电脑版做叙事反馈与写作；三方通过 shared/ 公共区协作，流水线为 G0 立项 → G1 路线 → G2 大纲 → G3 实施研究 → G4 叙事反馈 → G5 成稿 → G6 审核 → G7 交付；底部为路线完整性、证据台账、对话留痕三条防线">
+</p>
+
+> 若上图显示为空白，是你的网络无法访问 `raw.githubusercontent.com`（GitHub 的图片 CDN）。
+> 仓库里的 `docs/flow.png` 与 `docs/flow.svg` 文件本身是完好的，克隆到本地即可查看；
+> 页面顶部的 Mermaid 图与上图内容等价，不受此影响。
 
 ---
 
