@@ -4,6 +4,11 @@
 
 一个 **DeepSeek Harness Skill**：用**公共区 + 对话文件 + 证据台账**，让三个互相看不见的 AI 工具协作写出一篇数字不出错、路线不跑偏的论文。
 
+<p align="center">
+  <img src="docs/flow.png" width="100%"
+       alt="research-collab 协作流程：Codex 制定科研路线与大纲，DeepSeek Harness 按路线实施研究，豆包电脑版做叙事反馈与正文写作；三方通过 shared/ 公共区（route.md、outline.md 仅 Codex 可写，chat.md 为三方追加的对话）交换文件，全流程经过 G0 立项 → G1 路线 → G2 大纲 → G3 实施研究 → G4 叙事反馈 → G5 成稿 → G6 审核 → G7 交付 八个阶段">
+</p>
+
 [English summary](#english-summary) · [快速开始](#快速开始) · [它到底防什么事故](#它到底防什么事故) · [目录结构](#目录结构)
 
 ---
@@ -198,9 +203,17 @@ research-collab/
 ├── scripts/                        # init_workspace / check_shared / claim_check
 ├── templates/                      # 新项目模板（brief/route/outline/chat/decisions/...）
 ├── examples/walkthrough.md         # 一次完整的端到端演练
+├── docs/
+│   ├── flow.png                    # 首页流程图（README 引用）
+│   ├── flow.svg                    # 同图矢量版
+│   └── make_flow.py                # 生成上面两张图的脚本，改布局跑它即可
 ├── install.ps1  install.sh
 └── LICENSE
 ```
+
+改流程图：编辑 `docs/make_flow.py` 里的常量后 `python docs/make_flow.py`，再用浏览器
+（或 `msedge --headless --screenshot=docs/flow.png --window-size=1200,840 docs/flow.svg`）
+重新导出 PNG。
 
 ---
 
