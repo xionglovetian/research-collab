@@ -1,4 +1,4 @@
-# research-collab
+﻿# research-collab
 
 > 把 **Codex（定科研路线）→ DeepSeek Harness（实施研究）→ 豆包（定怎么讲 + 写作）** 串成一条可追溯的科研协作流水线。
 
@@ -131,7 +131,7 @@ G0 立项 ─► G1 路线(Codex) ─► G2 大纲(Codex) ─► G3 实施研究
 **Windows**
 
 ```powershell
-git clone https://github.com/<你的用户名>/research-collab.git
+git clone https://github.com/xionglovetian/research-collab.git
 cd research-collab
 .\install.ps1 -Codex        # -Codex 表示同时让 Codex 可见
 ```
@@ -139,7 +139,7 @@ cd research-collab
 **macOS / Linux**
 
 ```bash
-git clone https://github.com/<你的用户名>/research-collab.git
+git clone https://github.com/xionglovetian/research-collab.git
 cd research-collab
 ./install.sh --codex
 ```
