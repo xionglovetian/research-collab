@@ -1,0 +1,14 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# 本地产物
+*.tmp
+~$*
+.DS_Store
+Thumbs.db
+
+# 由 init_workspace.py 生成的项目工作区（仓库本身不含任何真实研究数据）
+02_data/raw/

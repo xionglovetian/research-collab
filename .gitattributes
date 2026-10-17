@@ -1,0 +1,10 @@
+# 统一换行，避免 Windows 检出的 CRLF 破坏 shell 脚本
+* text=auto
+
+*.md   text eol=lf
+*.py   text eol=lf
+*.sh   text eol=lf
+*.yaml text eol=lf
+*.yml  text eol=lf
+*.csv  text eol=lf
+*.ps1  text eol=crlf

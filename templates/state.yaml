@@ -1,0 +1,24 @@
+project: {{TITLE}}
+created: {{DATE}}
+updated: {{DATE}}
+owner_of_current_stage: user
+stage:
+  current: G0
+  name: 立项
+  gate_met: false
+frozen:
+  route: null
+  outline: null
+  claims: null
+deliverables:
+  target: {{TARGET}}
+  language: {{LANGUAGE}}
+  word_budget: {{WORD_BUDGET}}
+open_questions: []
+next_actions:
+  - who: user
+    what: 填完 00_brief/brief.md 与 glossary.md，确认研究问题
+    out: 00_brief/brief.md
+    needs: []
+blocked_on: []
+changes: []
