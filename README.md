@@ -241,16 +241,21 @@ research-collab/
 
 ## 详细流程图
 
-带配色、三方职责、G0–G7 流水线与三条防线的完整版：
+带配色、三方职责、G0–G7 流水线与三条防线的完整版（PNG / SVG 源文件在 `docs/`）。
+
+<details>
+<summary>展开查看大图</summary>
 
 <p align="center">
   <img src="docs/flow.png" width="100%"
        alt="research-collab 详细流程图：Codex 定科研路线与大纲、DeepSeek Harness 实施研究并对账、豆包电脑版做叙事反馈与写作；三方通过 shared/ 公共区协作，流水线为 G0 立项 → G1 路线 → G2 大纲 → G3 实施研究 → G4 叙事反馈 → G5 成稿 → G6 审核 → G7 交付；底部为路线完整性、证据台账、对话留痕三条防线">
 </p>
 
-> 若上图显示为空白，是你的网络无法访问 `raw.githubusercontent.com`（GitHub 的图片 CDN）。
-> 仓库里的 `docs/flow.png` 与 `docs/flow.svg` 文件本身是完好的，克隆到本地即可查看；
-> 页面顶部的 Mermaid 图与上图内容等价，不受此影响。
+</details>
+
+> 若展开后是空白，说明你的网络访问不到 `raw.githubusercontent.com`（GitHub 的图片 CDN，
+> 它与 `camo.githubusercontent.com` 在部分网络下不可达）。仓库里的 `docs/flow.png`
+> 与 `docs/flow.svg` 文件本身完好，克隆到本地即可查看；页面顶部的 Mermaid 图与它内容等价。
 
 ---
 
