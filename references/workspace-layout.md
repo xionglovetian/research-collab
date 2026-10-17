@@ -1,6 +1,8 @@
 # 工作区结构与文件契约
 
-一个项目 = 一个目录。三方只认这个目录，不认对话记忆。
+一个项目 = 一个目录。三方只认这个目录和公共区，不认对话记忆。
+
+**公共区由使用者自己建立**，位置不固定：可以在项目内 `shared/`，也可以在共享盘或网盘同步目录。实际位置记在 `state.yaml` 的 `shared_dir`（相对项目根或绝对路径），所有脚本据此定位。下面的目录树按"公共区在项目内"画，放在项目外时把它当作 `<shared_dir>/` 即可。
 
 ---
 
@@ -8,15 +10,7 @@
 
 ```
 <项目根>/
-├── state.yaml                 # ★ 唯一进度源：阶段、owner、冻结哈希、下一步
-├── shared/                    # ★ 公共区：三方只读，路线只有 Codex 写
-│   ├── route.md               # 科研路线（Codex）
-│   ├── outline.md             # 章节大纲（Codex）
-│   ├── changelog.md           # 路线变更记录（Codex）
-│   ├── chat.md                # ★ 三方对话（append-only，全员可写）
-│   ├── decisions.md           # 已裁决结论（DSH 沉淀）
-│   ├── route.sha256           # 冻结锚点（DSH 生成）
-│   └── outline.sha256
+├── state.yaml                 # ★ 唯一进度源：阶段、owner、shared_dir、冻结哈希、下一步
 ├── 00_brief/
 │   ├── brief.md               # 题目、用途、刊物、语言、字数、约束
 │   └── glossary.md            # 术语中英对照 + 计量口径
@@ -70,6 +64,7 @@ project: {项目名}
 created: 2026-01-01
 updated: 2026-01-05
 owner_of_current_stage: codex | dsh | doubao | user
+shared_dir: ./shared           # 公共区位置：相对项目根或绝对路径；null 表示尚未建立
 stage:
   current: G3                 # G0..G7
   name: 实施研究

@@ -62,10 +62,12 @@ DSH 是调度者——因为三个工具里只有它能可靠读写磁盘、执�
 
 ## 两条通道
 
-### 1. 公共区 `shared/` —— 三方共读，路线只有 Codex 写
+### 1. 公共区 —— 三方共读，路线只有 Codex 写
+
+**位置由你自己定**（项目内 `shared/`、共享盘、网盘同步目录都行），建立后在 `state.yaml` 的 `shared_dir` 里登记。脚本不代建目录。
 
 ```
-shared/
+<shared_dir>/
 ├── route.md      outline.md      changelog.md   ← 仅 Codex 写
 ├── chat.md                                      ← 三方追加（唯一例外）
 ├── decisions.md                                 ← DSH 沉淀裁决
@@ -191,24 +193,36 @@ DSH 读取 `~/.agents/skills`，Codex 读取 `~/.codex/skills`；脚本用目录
 
 ## 快速开始
 
-在 DSH 里说：
-
-> 用 research-collab 开一个新项目，题目是「施肥强度对水稻产量稳定性的影响」，投中文核心期刊
-
-DSH 会初始化工作区，陪你填 `brief.md`，然后逐棒推进：
+**公共区由你自己建立**——它是三方交换文件的中枢，放哪由你决定：项目内 `shared/`，或共享盘 / 网盘同步目录。脚本只往里放模板，不会替你建目录。
 
 ```powershell
-python "<SKILL_DIR>/scripts/init_workspace.py" "<项目目录>" --title "题目" --target "中文核心期刊"
+# 1) 你自己建公共区（脚本不代建）
+mkdir "<项目目录>\shared"
+#    或放在共享盘：mkdir "D:\OneDrive\科研共享\本项目"
+
+# 2) 初始化项目，并告诉脚本公共区在哪
+python "<SKILL_DIR>/scripts/init_workspace.py" "<项目目录>" `
+  --title "题目" --target "中文核心期刊" --shared-dir "<项目目录>\shared"
 ```
 
 生成：
 
 ```
-shared/ 00_brief/ 02_data/ 03_code/ 04_results/ 05_draft/ 06_review/ 07_final/ handoffs/
-state.yaml  README.md
+<项目目录>/                          公共区（你建的，位置任意）
+├── 00_brief/ 02_data/ 03_code/      ├── route.md      outline.md
+├── 04_results/ 05_draft/            ├── chat.md       decisions.md
+├── 06_review/ 07_final/ handoffs/   └── changelog.md
+├── state.yaml   ← 记下 shared_dir
+└── README.md
 ```
 
-每一步的提示词包存在 `handoffs/`，任何工具换个新会话都能顺着文件接手。详见 [examples/walkthrough.md](examples/walkthrough.md)。
+若 `--shared-dir` 指向的目录不存在，脚本会**报错退出并给出 `mkdir` 指令**，绝不替你创建。之后所有脚本从 `state.yaml` 的 `shared_dir` 自动定位公共区（也可用 `--shared` 临时覆盖）。
+
+在 DSH 里说：
+
+> 用 research-collab 开一个新项目，题目是「施肥强度对水稻产量稳定性的影响」，投中文核心期刊
+
+DSH 会陪你填 `brief.md`，然后逐棒推进。每一步的提示词包存在 `handoffs/`，任何工具换个新会话都能顺着文件接手。详见 [examples/walkthrough.md](examples/walkthrough.md)。
 
 ---
 
@@ -216,7 +230,7 @@ state.yaml  README.md
 
 | 脚本 | 作用 |
 |---|---|
-| `scripts/init_workspace.py` | 初始化工作区：目录、`state.yaml`、`chat.md`、台账表头、全部模板。只创建缺失文件，永不覆盖 |
+| `scripts/init_workspace.py` | 初始化项目骨架，并把模板放进**你自己建的**公共区（`--shared-dir`）。只创建缺失文件，永不覆盖 |
 | `scripts/check_shared.py` | `--freeze` 冻结路线哈希；`--verify` 校验是否被改；`--for <agent>` 列出等谁回应；`--tail N` 看最近对话 |
 | `scripts/claim_check.py` | 核对草稿数字与台账，检测强度升级，列出未使用证据。退出码 1 可直接当门禁 |
 

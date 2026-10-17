@@ -49,7 +49,17 @@ DSH 的实施顺序永远服从 `shared/route.md`，不服从任何一方在聊�
 | 路线对齐、审稿意见 | Codex | 拿大纲 + 成稿节 + 台账 + 叙事反馈 |
 | 交付物组装（Word/LaTeX/PPT） | DSH | 走 `07_final/` |
 
-## 3. 公共区权限：`shared/`
+## 3. 公共区：由使用者自己建立
+
+**公共区不随项目自动创建。** 它是三方交换文件的中枢，位置必须由使用者在 G0 阶段自己决定并手工建立：
+
+- 可以放在项目内 `shared/`，也可以放在共享盘、网盘同步目录（`D:/OneDrive/科研共享/本项目`），只要三方都读得到；
+- 建好后用 `init_workspace.py --shared-dir "<路径>"` 登记，路径写进 `state.yaml` 的 `shared_dir`；
+- 脚本检测到目录不存在会**拒绝执行并给出 `mkdir` 指令**，不会替你创建。
+
+`shared_dir` 是相对项目根的路径（如 `./shared`）或绝对路径。多个项目共用一个大目录时，务必一项目一个子目录，否则 `chat.md` 会互相污染。
+
+**没有公共区就不要进入 G1**——路线、大纲、对话全都写在那里。
 
 | 文件 | 谁写 | 其他人 |
 |---|---|---|
@@ -89,7 +99,7 @@ G0 立项 ─► G1 路线(Codex) ─► G2 大纲(Codex) ─► G3 实施研究
 
 | 门 | 名称 | 通过条件 | 谁判 |
 |---|---|---|---|
-| **G0** | 立项 | `00_brief/brief.md` 填齐：题目、用途、目标刊物/字数、语言、已有数据、deadline、术语表 | 用户 |
+| **G0** | 立项 | ①使用者已**自己建立公共区目录**并用 `--shared-dir` 登记进 `state.yaml`；②`00_brief/brief.md` 填齐：题目、用途、目标刊物/字数、语言、已有数据、deadline、术语表 | 用户 |
 | **G1** | 路线 | `shared/route.md` 含研究问题、创新点、分阶段技术路线（每阶段有验收标准）、证据需求清单；用户确认后 `--freeze` | 用户 |
 | **G2** | 大纲 | `shared/outline.md` 每节标明目的、字数、需要的 claim；与 route 一致 | DSH 对照 route |
 | **G3** | 实施研究 | 按 route 逐阶段实施；每个阶段产出进 `04_results/`、数字进 `claims.csv`、进度发 `chat.md`；大纲所有 claim 需求或有结果、或被明确标为缺口 | DSH |
@@ -158,18 +168,32 @@ G4 之后若豆包指出关键证据缺失，允许回到 G3 补做一次；但�
 
 ## 10. 首次使用 / 新项目初始化
 
+**第一步：使用者自己建立公共区**（脚本不代建）
+
 ```powershell
-python "${SKILL_DIR}/scripts/init_workspace.py" "<项目目录>" --title "项目名" --target "中文核心期刊" --language zh
+mkdir "<项目目录>\shared"                 # 或放在共享盘：mkdir "D:\OneDrive\科研共享\本项目"
 ```
 
-会建好 `shared/`、`00_brief/ … 07_final/`、`state.yaml`、`chat.md`、台账表头与全部模板，并打印下一棒。目录已有内容时默认拒绝覆盖，补缺失文件加 `--fill`。
-
-常用校验：
+**第二步：初始化项目并登记公共区**
 
 ```powershell
-python "${SKILL_DIR}/scripts/check_shared.py" --verify          # 路线是否被人动过
-python "${SKILL_DIR}/scripts/check_shared.py" --for dsh        # 谁在等我回应
-python "${SKILL_DIR}/scripts/check_shared.py" --freeze         # Codex 定稿后冻结
+python "${SKILL_DIR}/scripts/init_workspace.py" "<项目目录>" `
+  --title "项目名" --target "中文核心期刊" --language zh `
+  --shared-dir "<项目目录>\shared"
+```
+
+会建好 `00_brief/ … 07_final/`、`state.yaml`、台账表头与项目模板，**并往你建的公共区里放入** `route.md`、`outline.md`、`chat.md`、`decisions.md`、`changelog.md`，最后打印下一棒。
+
+- 若 `--shared-dir` 指向的目录不存在，脚本**报错退出（exit 3）并给出 `mkdir` 指令**，绝不替你创建。
+- 不传 `--shared-dir` 时只建项目骨架，并提示你去建公共区；之后用 `--fill --shared-dir <路径>` 补齐。
+- 已有内容默认拒绝覆盖；`--fill` 只补缺失文件，但会更新 `state.yaml` 的 `shared_dir`。
+
+常用校验（公共区位置从 `state.yaml` 自动读取，也可用 `--shared` 覆盖）：
+
+```powershell
+python "${SKILL_DIR}/scripts/check_shared.py" --project "<项目目录>" --verify    # 路线是否被人动过
+python "${SKILL_DIR}/scripts/check_shared.py" --project "<项目目录>" --for dsh  # 谁在等我回应
+python "${SKILL_DIR}/scripts/check_shared.py" --project "<项目目录>" --freeze   # Codex 定稿后冻结
 python "${SKILL_DIR}/scripts/claim_check.py" --draft 05_draft/v1_results.md --claims 04_results/claims.csv
 ```
 

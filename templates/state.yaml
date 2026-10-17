@@ -2,6 +2,7 @@ project: {{TITLE}}
 created: {{DATE}}
 updated: {{DATE}}
 owner_of_current_stage: user
+shared_dir: {{SHARED_DIR}}
 stage:
   current: G0
   name: 立项

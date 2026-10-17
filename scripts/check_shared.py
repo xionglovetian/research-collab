@@ -39,6 +39,32 @@ def sha256_of(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def read_shared_from_state(project: Path) -> Path | None:
+    """从 state.yaml 的 shared_dir 读取公共区位置（公共区可能在项目之外）。"""
+    state = project / "state.yaml"
+    if not state.is_file():
+        return None
+    text = state.read_text(encoding="utf-8-sig", errors="replace")
+    m = re.search(r"^shared_dir:\s*(.+?)\s*(?:#.*)?$", text, re.M)
+    if not m:
+        return None
+    raw = m.group(1).strip().strip("\"'").strip()
+    if not raw or raw.lower() in {"null", "~", "none"}:
+        return None
+    path = Path(raw).expanduser()
+    if not path.is_absolute():
+        path = (project / path).resolve()
+    return path
+
+
+def resolve_shared(project: Path, explicit: str | None) -> Path:
+    """定位公共区：命令行 --shared > state.yaml 的 shared_dir > <project>/shared"""
+    if explicit:
+        return Path(explicit).expanduser().resolve()
+    found = read_shared_from_state(project)
+    return found if found is not None else project / "shared"
+
+
 # ---------------------------------------------------------------- 对话解析
 
 class Message:
@@ -183,7 +209,11 @@ def do_for(shared: Path, agent: str, messages: list[Message], state: dict, tail:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="校验公共区完整性与对话待办")
     parser.add_argument("--project", default=".", help="项目根目录，默认当前目录")
-    parser.add_argument("--shared", default=None, help="公共区目录，默认 <project>/shared")
+    parser.add_argument(
+        "--shared",
+        default=None,
+        help="公共区目录；省略时读 state.yaml 的 shared_dir，再退到 <project>/shared",
+    )
     parser.add_argument("--chat", default=None, help="对话文件，默认 <shared>/chat.md")
     parser.add_argument("--freeze", action="store_true", help="冻结路线/大纲，写 sha256")
     parser.add_argument("--verify", action="store_true", help="校验哈希（默认动作）")
@@ -193,11 +223,18 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     project = Path(args.project).expanduser().resolve()
-    shared = Path(args.shared).expanduser().resolve() if args.shared else project / "shared"
+    shared = resolve_shared(project, args.shared)
     chat_path = Path(args.chat).expanduser().resolve() if args.chat else shared / "chat.md"
 
     if not shared.is_dir():
         print(f"[x] 找不到公共区：{shared}", file=sys.stderr)
+        print("    公共区由使用者自己建立。先建目录，再初始化时用 --shared-dir 登记：", file=sys.stderr)
+        print(f'      mkdir "{shared}"', file=sys.stderr)
+        print(
+            f'      python init_workspace.py "{project}" --fill --shared-dir "{shared}"',
+            file=sys.stderr,
+        )
+        print("    或用 --shared 直接指定它现在的位置。", file=sys.stderr)
         return 2
 
     messages = parse_chat(chat_path)
