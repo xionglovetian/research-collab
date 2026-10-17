@@ -1,4 +1,4 @@
-<#
+﻿<#
     research-collab 安装脚本（Windows / PowerShell）
 
     用法：
@@ -25,7 +25,8 @@ $agentsHome = if ($env:DSH_AGENTS_HOME) { $env:DSH_AGENTS_HOME } else { Join-Pat
 $dest = Join-Path $agentsHome "skills\$name"
 
 if (-not (Test-Path (Join-Path $src 'SKILL.md'))) {
-    Write-Error "找不到 SKILL.md；请在仓库根目录运行本脚本。"
+    Write-Host "找不到 SKILL.md；请在仓库根目录运行本脚本。" -ForegroundColor Red
+    exit 2
 }
 
 if ((Test-Path $dest) -and -not $Force) {
@@ -71,3 +72,5 @@ if ($Codex) {
 Write-Host ""
 Write-Host "验证安装："
 Write-Host "  python `"$dest\scripts\init_workspace.py`" `"<项目目录>`" --title `"题目`""
+
+exit 0
